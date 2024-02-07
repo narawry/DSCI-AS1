@@ -3,13 +3,13 @@ import streamlit as st
 import seaborn as sns 
 import matplotlib.pyplot as plt 
 
-df = pd.read_csv('sleep_health_lifestyle.csv')
+df = pd.read_csv('students_mental_health.csv')
 
 progress_bar = st.sidebar.progress(0)
 status_text = st.sidebar.empty()
 
 st.title("Dashboard Application")
-st.subheader("Sleep, Health and Lifestyle")
+st.subheader("Students' Mental Health")
 
 st.write(df.head(3))
 
@@ -17,8 +17,8 @@ st.write(df.head(3))
     # Gender = st.selectbox('Gender', ['Male', 'Female'])
     # my_submit_button = st.form_submit_button()
 
-selected_x_var = st.selectbox('Choose any attribute for x axis:', ['Age', 'Sleep Duration', 'Quality of Sleep', 'Physical Activity Level', 'Stress Level'])
-selected_y_var = st.selectbox('Choose any attribute for y axis:', ['Age', 'Sleep Duration', 'Quality of Sleep', 'Physical Activity Level', 'Stress Level'])
+selected_x_var = st.selectbox('Choose any attribute for x axis:', [])
+selected_y_var = st.selectbox('Choose any attribute for y axis:', [])
 
 gender_rad = st.radio('Gender', ['Male', 'Female']) 
 
