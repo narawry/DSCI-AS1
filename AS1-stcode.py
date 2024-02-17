@@ -2,6 +2,7 @@ import pandas as pd
 import streamlit as st 
 import seaborn as sns 
 import matplotlib.pyplot as plt 
+import plotly.express as px 
 
 df = pd.read_csv('students_mental_health.csv')
 
@@ -25,7 +26,7 @@ if first_page == 'Dashboards':
     # First Dashboard
     if dash_no == 'First Dashboard':
         visual_type = st.selectbox('Select A Visualization:', 
-                                    ['Bar', 'Histogram', 'Scatter', 'Line', 'Area'])
+                                    ['Bar', 'Histogram', 'Scatter', 'Line', 'Area', 'Pie'])
     
         # Using st.radio to divide gender
         gender_rad = st.radio('Gender', ['Male', 'Female'])
@@ -40,7 +41,10 @@ if first_page == 'Dashboards':
                                         'Relationship_Status', 'Substance_Use', 'Extracurricular_Involvement', 
                                         'Financial_Stress'])
             bar_graph = filteredbygender[bar_att].value_counts()
-            st.bar_chart(bar_graph)
+
+            fig = px.bar(x=bar_graph.index, y=bar_graph.values, labels={'x': bar_att, 'y': 'Count'}, template='plotly_dark')
+            fig.update_layout(title="Bar Graph", xaxis_title=bar_att, yaxis_title="Count", height=600, width=800)
+            st.plotly_chart(fig)
 
         # 2nd Visualization
         elif visual_type == 'Histogram':
@@ -48,18 +52,10 @@ if first_page == 'Dashboards':
             hist_att = st.selectbox('Choose an attribute:', 
                                    ['Age', 'CGPA', 'Semester_Credit_Load'])
     
-            if hist_att == 'Age':
-                fig, ax = plt.subplots()
-                sns.histplot(filteredbygender[hist_att], kde=False, bins=[5,10,15,20,25,30,35,40], ax=ax)
-                st.pyplot(fig)
-            elif hist_att == 'CGPA':
-                fig, ax = plt.subplots()
-                sns.histplot(filteredbygender[hist_att], kde=False, bins=[2.5,3.0,3.5,4.0], ax=ax)
-                st.pyplot(fig)
-            else:
-                fig, ax = plt.subplots()
-                sns.histplot(filteredbygender[hist_att], kde=False, bins=[15,20,25,30], ax=ax)
-                st.pyplot(fig)
+            fig = px.histogram(filteredbygender, x=hist_att, template='plotly_dark')
+            fig.update_layout(title="Histogram", xaxis_title=hist_att, yaxis_title="Count")
+            fig.update_traces(marker=dict(line=dict(width=1, color='White')))
+            st.plotly_chart(fig)
 
         # 3rd Visualization
         elif visual_type == 'Scatter':
@@ -71,14 +67,9 @@ if first_page == 'Dashboards':
                               ['Age', 'CGPA', 'Stress_Level', 'Depression_Score', 
                               'Anxiety_Score', 'Financial_Stress', 'Semester_Credit_Load'], index=1)
 
-            sns.set_style('darkgrid')
-            markers = {"Male": "X", "Female": "o"}
-            fig, ax = plt.subplots()
-            ax = sns.scatterplot(data=filteredbygender, x=x_axis, y=y_axis, markers=markers)
-            plt.xlabel(x_axis)
-            plt.ylabel(y_axis)
-            plt.title("Scatter Plot")
-            st.pyplot(fig)
+            fig = px.scatter(filteredbygender, x=x_axis, y=y_axis, color='Gender', template='plotly_dark')
+            fig.update_layout(title="Scatter Plot", xaxis_title=x_axis, yaxis_title=y_axis, height=600, width=800)
+            st.plotly_chart(fig)
 
         # 4th Visualization
         elif visual_type == 'Line':
@@ -102,11 +93,26 @@ if first_page == 'Dashboards':
             area_chart = filteredbygender[area_att].value_counts()
             st.area_chart(area_chart)
 
+        # 6th Visualization
+        elif visual_type == 'Pie':
+            st.subheader('Pie Chart')
+            pie_att = st.selectbox('Choose an attribute:', 
+                           ['Course', 'Sleep_Quality', 'Physical_Activity', 'Diet_Quality', 'Social_Support', 
+                            'Relationship_Status', 'Substance_Use', 'Counseling_Service_Use', 
+                            'Chronic_Illness', 'Extracurricular_Involvement', 'Residence_Type'])
+    
+            pie_chart = filteredbygender[pie_att].value_counts().reset_index()
+            pie_chart.columns = ['Labels', 'Values']
+
+            fig = px.pie(pie_chart, values='Values', names='Labels', template='plotly_dark')
+            fig.update_layout(height=650, width=850)
+            st.plotly_chart(fig)
+
 
     # Second Dashboard
     if dash_no == 'Second Dashboard':
         visual_type2 = st.selectbox('Select A Visualization:', 
-                                 ['Bar', 'Histogram', 'Scatter', 'Line'])
+                                 ['Bar', 'Histogram', 'Scatter', 'Line', 'Area', 'Pie'])
     
         # Using st.radio to divide gender
         gender_rad = st.radio('Gender', ['Male', 'Female'])
@@ -126,11 +132,13 @@ if first_page == 'Dashboards':
         # 2nd Visualization
         elif visual_type2 == 'Histogram':
             st.subheader('Histogram')
-            selected_column = st.selectbox('Choose an attribute:', 
-                                       ['Age', 'CGPA', 'Stress_Level', 'Depression_Score', 
-                                        'Anxiety_Score', 'Financial_Stress', 'Semester_Credit_Load'])
-            st.write(sns.histplot(filteredbygender[selected_column], kde=True))
-            st.pyplot()
+            hist_att = st.selectbox('Choose an attribute:', 
+                                   ['Age', 'CGPA', 'Semester_Credit_Load'])
+            
+            fig = px.histogram(filteredbygender, x=hist_att, template='plotly_dark')
+            fig.update_layout(title="Histogram", xaxis_title=hist_att, yaxis_title="Count")
+            fig.update_traces(marker=dict(line=dict(width=1, color='White')))
+            st.plotly_chart(fig)
 
         # 3rd Visualization
         elif visual_type2 == 'Scatter':
@@ -142,15 +150,43 @@ if first_page == 'Dashboards':
                               ['Age', 'CGPA', 'Stress_Level', 'Depression_Score', 
                               'Anxiety_Score', 'Financial_Stress', 'Semester_Credit_Load'], index=1)
 
-            sns.set_style('darkgrid')
-            markers = {"Male": "X", "Female": "o"}
-            fig, ax = plt.subplots()
-            ax = sns.scatterplot(data=filteredbygender, x=x_axis, y=y_axis, markers=markers)
-            plt.xlabel(x_axis)
-            plt.ylabel(y_axis)
-            plt.title("Scatter Plot")
-            st.pyplot(fig)
+            fig = px.scatter(filteredbygender, x=x_axis, y=y_axis, color='Gender', template='plotly_dark')
+            fig.update_layout(title="Scatter Plot", xaxis_title=x_axis, yaxis_title=y_axis)
+            st.plotly_chart(fig)
 
         # 4th Visualization
         elif visual_type2 == 'Line':
             st.subheader('Line Chart')
+            line_att = st.selectbox('Choose an attribute:', 
+                                       ['Age', 'Course', 'Stress_Level', 'Depression_Score', 'Anxiety_Score', 
+                                        'Sleep_Quality', 'Physical_Activity', 'Diet_Quality', 'Social_Support', 
+                                        'Relationship_Status', 'Substance_Use', 'Extracurricular_Involvement', 
+                                        'Financial_Stress'])
+            line_chart = filteredbygender[line_att].value_counts()
+            st.line_chart(line_chart)
+
+        # 5th Visualization
+        elif visual_type2 == 'Area':
+            st.subheader('Area Chart')
+            area_att = st.selectbox('Choose an attribute:', 
+                                       ['Age', 'Course', 'Stress_Level', 'Depression_Score', 'Anxiety_Score', 
+                                        'Sleep_Quality', 'Physical_Activity', 'Diet_Quality', 'Social_Support', 
+                                        'Relationship_Status', 'Substance_Use', 'Extracurricular_Involvement', 
+                                        'Financial_Stress'])
+            area_chart = filteredbygender[area_att].value_counts()
+            st.area_chart(area_chart)
+
+        # 6th Visualization
+        elif visual_type == 'Pie':
+            st.subheader('Pie Chart')
+            pie_att = st.selectbox('Choose an attribute:', 
+                           ['Course', 'Sleep_Quality', 'Physical_Activity', 'Diet_Quality', 'Social_Support', 
+                            'Relationship_Status', 'Substance_Use', 'Counseling_Service_Use', 
+                            'Chronic_Illness', 'Extracurricular_Involvement', 'Residence_Type'])
+    
+            pie_chart = filteredbygender[pie_att].value_counts().reset_index()
+            pie_chart.columns = ['Labels', 'Values']
+
+            fig = px.pie(pie_chart, values='Values', names='Labels', template='plotly_dark')
+            fig.update_layout(height=650, width=850)
+            st.plotly_chart(fig)
